@@ -12,6 +12,10 @@ on:
     branches:
       - "**"
 
+# PR에 댓글을 달려면 권한 설정 필요
+permissions:
+  pull-requests: write
+
 # 하나의 Workflow는 1개 이상의 Job으로 구성된다.
 # 여러 Job은 기본적으로 병렬적으로 수행된다.
 jobs:
@@ -25,6 +29,14 @@ jobs:
     steps:
       - name: Github Repository 파일 가져오기
         uses: actions/checkout@v4
+
+      - name: PR에 코멘트를 추가하겠습니다.
+        # main 브랜치가 아닐 때만 이 단계 실행
+        if: github.ref != 'refs/heads/main'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "안녕하세요! PR을 검토하겠습니다. 👋"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Node 설치
         uses: actions/setup-node@v4
